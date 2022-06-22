@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "332585783376",
+    "project_id": "mapapplication-354114",
+    "storage_bucket": "mapapplication-354114.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:332585783376:android:c13382d30119af28080155",
+        "android_client_info": {
+          "package_name": "com.eugenics.mapapplication"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "332585783376-noqnoe6go39lfagju39k9fcl1ov2h0es.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.eugenics.mapapplication",
+            "certificate_hash": "eb2b9af39f72b446d0aa49ab8b729f342c8012ac"
+          }
+        },
+        {
+          "client_id": "332585783376-13hls2upm1o8c6903krdm83ho2g0ipmo.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCoQcciM0NXI6WlQPlfOq4vzGpzUffy-2A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "332585783376-13hls2upm1o8c6903krdm83ho2g0ipmo.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
