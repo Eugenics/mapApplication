@@ -13,6 +13,7 @@ import androidx.fragment.app.FragmentManager
 import com.eugenics.mapapplication.BuildConfig
 import com.eugenics.mapapplication.databinding.MapFrameViewBinding
 import com.tomtom.sdk.common.measures.Distance
+import com.tomtom.sdk.common.measures.Units
 import com.tomtom.sdk.common.time.Duration
 import com.tomtom.sdk.location.LocationEngine
 import com.tomtom.sdk.location.android.AndroidLocationEngine
@@ -25,6 +26,7 @@ import com.tomtom.sdk.maps.display.location.LocationMarkerType
 import com.tomtom.sdk.maps.display.marker.Marker
 import com.tomtom.sdk.maps.display.marker.MarkerOptions
 import com.tomtom.sdk.maps.display.ui.MapFragment
+import com.tomtom.sdk.maps.display.ui.scale.ScaleView
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -143,6 +145,8 @@ private fun Map(
                             )
                         )
                     }
+
+                    it.scaleView.units = Units.METRIC
                 }
             }
     }

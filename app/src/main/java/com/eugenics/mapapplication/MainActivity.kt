@@ -50,6 +50,14 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+    }
+
     private fun checkPermission(permission: String, requestCode: Int) {
         val check = ContextCompat.checkSelfPermission(this@MainActivity, permission)
         if (check == PackageManager.PERMISSION_DENIED) {

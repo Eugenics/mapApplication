@@ -1,1 +1,1 @@
-mapApiKey = "teXRiAw5SvKtnQOVafhBlRQ7WNoRGy9S"
+mapApiKey = ""
