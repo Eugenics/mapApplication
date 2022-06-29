@@ -1,19 +1,16 @@
 package com.eugenics.mapapplication.navigation
 
-import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.fragment.app.FragmentManager
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.eugenics.mapapplication.ui.screens.map.MapScreen
+import com.eugenics.mapapplication.ui.screens.markers.MarkersScreen
 
 
 @Composable
 fun NavGraph(
-    navController: NavHostController,
-    context: Context,
-    fragmentManager: FragmentManager
+    navController: NavHostController
 ) {
     NavHost(
         navController = navController,
@@ -21,10 +18,13 @@ fun NavGraph(
     ) {
         composable(route = Screens.Map.route) {
             MapScreen(
-                context = context,
-                fragmentManager = fragmentManager
+                navController = navController
             )
         }
-        composable(route = Screens.Markers.route) {}
+        composable(route = Screens.Markers.route) {
+            MarkersScreen(
+                navController = navController
+            )
+        }
     }
 }

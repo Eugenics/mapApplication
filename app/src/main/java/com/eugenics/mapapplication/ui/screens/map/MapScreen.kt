@@ -1,11 +1,19 @@
 package com.eugenics.mapapplication.ui.screens.map
 
 import android.Manifest
-import android.content.Context
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.Place
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.fragment.app.FragmentManager
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
+import com.eugenics.mapapplication.R
+import com.eugenics.mapapplication.navigation.Screens
 import com.eugenics.mapapplication.ui.screens.map.components.TomMap
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
@@ -16,28 +24,50 @@ import com.google.accompanist.permissions.shouldShowRationale
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(
-    context: Context,
-    fragmentManager: FragmentManager
+    navController: NavHostController
 ) {
     val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
-    Scaffold { paddingValues ->
+    Scaffold(
+        topBar = {
+            SmallTopAppBar(
+                title = {
+                    Text(
+                        text = "Map",
+                        style = MaterialTheme.typography.titleSmall,
+                        modifier = Modifier.padding(5.dp)
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = {}) {
+                        Icon(imageVector = Icons.Filled.Menu, contentDescription = null)
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            navController.navigate(Screens.Markers.route)
+                        }
+                    ) {
+                        Icon(imageVector = Icons.Filled.Place, contentDescription = null)
+                    }
+                }
+            )
+        }
+    ) { paddingValues ->
         if (locationPermissionState.status == PermissionStatus.Granted) {
             TomMap(
-                paddingValues = paddingValues,
-                supportFragmentManager = fragmentManager,
-                context = context
+                paddingValues = paddingValues
             )
         } else {
             Column {
                 val textToShow = if (locationPermissionState.status.shouldShowRationale) {
-                    "The location data is important for this app. Please grant the permission."
+                    stringResource(R.string.grant_request_info)
                 } else {
-                    "Location permission required for this feature to be available. " +
-                            "Please grant the permission"
+                    stringResource(R.string.grant_requirement_info)
                 }
                 Text(textToShow)
                 Button(onClick = { locationPermissionState.launchPermissionRequest() }) {
-                    Text("Request permission")
+                    Text(stringResource(R.string.request_premissions))
                 }
             }
         }

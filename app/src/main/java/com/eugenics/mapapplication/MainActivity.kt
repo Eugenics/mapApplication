@@ -16,9 +16,7 @@ class MainActivity : AppCompatActivity() {
             val navController = rememberNavController()
             MapApplicationTheme {
                 NavGraph(
-                    navController = navController,
-                    context = this,
-                    fragmentManager = supportFragmentManager
+                    navController = navController
                 )
             }
         }
