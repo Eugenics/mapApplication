@@ -3,9 +3,7 @@ package com.eugenics.mapapplication.ui.screens.map.components
 import android.content.Context
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -13,6 +11,7 @@ import androidx.compose.ui.viewinterop.AndroidViewBinding
 import androidx.fragment.app.FragmentManager
 import com.eugenics.mapapplication.BuildConfig
 import com.eugenics.mapapplication.databinding.MapFrameViewBinding
+import com.tomtom.sdk.common.location.GeoCoordinate
 import com.tomtom.sdk.common.measures.Distance
 import com.tomtom.sdk.common.measures.Units
 import com.tomtom.sdk.common.time.Duration
@@ -27,6 +26,11 @@ import com.tomtom.sdk.maps.display.location.LocationMarkerType
 import com.tomtom.sdk.maps.display.marker.Marker
 import com.tomtom.sdk.maps.display.marker.MarkerOptions
 import com.tomtom.sdk.maps.display.ui.MapFragment
+
+private val androidLocationEngineConfig = AndroidLocationEngineConfig(
+    minTimeInterval = Duration.ofMilliseconds(1000L),
+    minDistance = Distance.ofMeters(10.0)
+)
 
 @Composable
 fun TomMap(
@@ -45,21 +49,15 @@ fun TomMap(
         )
     }
 
-    val androidLocationEngineConfig = AndroidLocationEngineConfig(
-        minTimeInterval = Duration.ofMilliseconds(1000L),
-        minDistance = Distance.ofMeters(10.0)
-    )
     val locationEngine: LocationEngine = AndroidLocationEngine(
         context = context,
         config = androidLocationEngineConfig
-    ).also {
-        it.enable()
-    }
+    )
 
     val cameraOptions = rememberSaveable {
         mutableListOf(
             CameraOptions(
-                position = locationEngine.lastKnownLocation?.position,
+                position = getCurrentLocation(locationEngine),
                 zoom = 15.0,
                 tilt = 0.0
             )
@@ -73,49 +71,52 @@ fun TomMap(
         )
     }
 
-    val mapFragment = MapFragment.newInstance(mapOptions = mapOptions)
-    mapFragment.getMapAsync { map ->
-        locationEngine.disable()
-        map.setLocationEngine(locationEngine)
-        map.enableLocationMarker(LocationMarkerOptions(LocationMarkerType.CHEVRON))
-        locationEngine.enable()
+    var mapFragment = MapFragment.newInstance(mapOptions = mapOptions)
 
-        map.isMarkersFadingEnabled = false
-        map.isMarkersShrinkingEnabled = false
+    LaunchedEffect(key1 = mapFragment) {
+        mapFragment.getMapAsync { map ->
+            locationEngine.disable()
+            map.setLocationEngine(locationEngine)
+            map.enableLocationMarker(LocationMarkerOptions(LocationMarkerType.CHEVRON))
+            locationEngine.enable()
 
-        if (markers.isNotEmpty()) {
-            markers.forEach {
-                map.addMarker(it)
+            map.isMarkersFadingEnabled = false
+            map.isMarkersShrinkingEnabled = false
+
+            if (markers.isNotEmpty()) {
+                markers.forEach {
+                    map.addMarker(it)
+                }
             }
-        }
 
-        map.addOnMapLongClickListener { coordinate ->
-            val markerOptions = MarkerOptions(
-                coordinate = coordinate,
-                balloonText = "Marker: ${coordinate.longitude},${coordinate.latitude}",
-                pinImage = ImageFactory.fromAssets("icons/location_96.png")
-            )
-            markers.add(markerOptions)
-            map.addMarker(markerOptions)
-            true
-        }
-        map.addOnMarkerClickListener { marker: Marker ->
-            if (!marker.isSelected()) {
-                balloonText.value = marker.balloonText
-                showMarkerDialog.value = true
-            }
-        }
-
-        map.addOnCameraChangeListener {
-            cameraOptions.add(
-                0, CameraOptions(
-                    position = map.cameraPosition().position,
-                    zoom = map.cameraPosition().zoom,
-                    tilt = map.cameraPosition().tilt
+            map.addOnMapLongClickListener { coordinate ->
+                val markerOptions = MarkerOptions(
+                    coordinate = coordinate,
+                    balloonText = "Marker: ${coordinate.longitude},${coordinate.latitude}",
+                    pinImage = ImageFactory.fromAssets("icons/location_96.png")
                 )
-            )
+                markers.add(markerOptions)
+                map.addMarker(markerOptions)
+                true
+            }
+            map.addOnMarkerClickListener { marker: Marker ->
+                if (!marker.isSelected()) {
+                    balloonText.value = marker.balloonText
+                    showMarkerDialog.value = true
+                }
+            }
+
+            map.addOnCameraChangeListener {
+                cameraOptions.add(
+                    0, CameraOptions(
+                        position = map.cameraPosition().position,
+                        zoom = map.cameraPosition().zoom,
+                        tilt = map.cameraPosition().tilt
+                    )
+                )
+            }
+            mapFragment.scaleView.units = Units.METRIC
         }
-        mapFragment.scaleView.units = Units.METRIC
     }
 
     AndroidViewBinding(
@@ -127,7 +128,15 @@ fun TomMap(
                 .replace(this.mapContainer.id, mapFragment, "MAP_TAG")
                 .commit()
         } else {
-            supportFragmentManager.findFragmentByTag("MAP_TAG") as MapFragment
+            mapFragment = supportFragmentManager.findFragmentByTag("MAP_TAG") as MapFragment
         }
     }
+}
+
+private fun getCurrentLocation(androidLocationEngine: LocationEngine): GeoCoordinate {
+    androidLocationEngine.enable()
+    val coordinates = androidLocationEngine
+        .lastKnownLocation?.position ?: GeoCoordinate(55.0, 83.0)
+    androidLocationEngine.disable()
+    return coordinates
 }
