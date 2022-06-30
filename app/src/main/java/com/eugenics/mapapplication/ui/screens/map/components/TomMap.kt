@@ -9,6 +9,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import com.eugenics.mapapplication.BuildConfig
+import com.eugenics.mapapplication.domain.model.MapMarker
+import com.eugenics.mapapplication.domain.util.Converter
 import com.tomtom.sdk.common.location.GeoCoordinate
 import com.tomtom.sdk.common.measures.Distance
 import com.tomtom.sdk.common.time.Duration
@@ -29,12 +31,14 @@ private val androidLocationEngineConfig = AndroidLocationEngineConfig(
     minDistance = Distance.ofMeters(10.0)
 )
 
+private val pinImage = ImageFactory.fromAssets("icons/location_96.png")
+
 @Composable
 fun TomMap(
     paddingValues: PaddingValues,
     context: Context = LocalContext.current
 ) {
-    val markers = rememberSaveable { mutableListOf<MarkerOptions>() }
+    val markers = rememberSaveable { mutableListOf<MapMarker>() }
     val showMarkerDialog = remember { mutableStateOf(false) }
     val balloonText = remember { mutableStateOf("") }
 
@@ -79,18 +83,33 @@ fun TomMap(
 
         if (markers.isNotEmpty()) {
             markers.forEach {
-                map.addMarker(it)
+                map.addMarker(
+                    MarkerOptions(
+                        coordinate = GeoCoordinate(latitude = it.lat, longitude = it.long),
+                        balloonText = it.text,
+                        pinImage = pinImage
+                    )
+                )
             }
         }
 
         map.addOnMapLongClickListener { coordinate ->
-            val markerOptions = MarkerOptions(
-                coordinate = coordinate,
-                balloonText = "Marker: ${coordinate.longitude},${coordinate.latitude}",
-                pinImage = ImageFactory.fromAssets("icons/location_96.png")
+            val mapMarker = MapMarker(
+                title = "Marker",
+                text = "Marker: ${Converter.latToLatDeg(coordinate.latitude)}, " +
+                        Converter.longToLongDeg(coordinate.longitude),
+                lat = coordinate.latitude,
+                long = coordinate.longitude
             )
-            markers.add(markerOptions)
-            map.addMarker(markerOptions)
+
+            markers.add(mapMarker)
+            map.addMarker(
+                MarkerOptions(
+                    coordinate = coordinate,
+                    balloonText = mapMarker.text,
+                    pinImage = pinImage
+                )
+            )
             true
         }
 
