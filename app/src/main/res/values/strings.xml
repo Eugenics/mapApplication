@@ -3,4 +3,10 @@
     <string name="grant_request_info">The location data is important for this app. Please grant the permission.</string>
     <string name="grant_requirement_info"> Location permission required for this feature to be available. Please grant the permission</string>
     <string name="request_premissions">Request permission</string>
+    <string name="map">Map</string>
+    <string name="markers">Markers</string>
+    <string name="marker">Marker</string>
+    <string name="title">Title</string>
+    <string name="save">Save</string>
+    <string name="mark">Mark</string>
 </resources>

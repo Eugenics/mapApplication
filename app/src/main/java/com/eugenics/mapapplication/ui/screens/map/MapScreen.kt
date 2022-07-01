@@ -13,18 +13,23 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.eugenics.mapapplication.R
+import com.eugenics.mapapplication.domain.model.MapMarker
 import com.eugenics.mapapplication.navigation.Screens
 import com.eugenics.mapapplication.ui.screens.map.components.TomMap
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
+import kotlinx.coroutines.flow.StateFlow
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun MapScreen(
-    navController: NavHostController
+    navController: NavHostController,
+    markers: StateFlow<List<MapMarker>>,
+    setMarkerHandler: (mapMarker: MapMarker) -> Unit = { _ -> },
+    saveMarkerHandler: (List<MapMarker>) -> Unit = { _ -> }
 ) {
     val locationPermissionState = rememberPermissionState(Manifest.permission.ACCESS_FINE_LOCATION)
     Scaffold(
@@ -32,7 +37,7 @@ fun MapScreen(
             SmallTopAppBar(
                 title = {
                     Text(
-                        text = "Map",
+                        text = stringResource(R.string.map),
                         style = MaterialTheme.typography.titleSmall,
                         modifier = Modifier.padding(5.dp)
                     )
@@ -56,7 +61,11 @@ fun MapScreen(
     ) { paddingValues ->
         if (locationPermissionState.status == PermissionStatus.Granted) {
             TomMap(
-                paddingValues = paddingValues
+                navController = navController,
+                paddingValues = paddingValues,
+                markers = markers,
+                setMarkerHandler = setMarkerHandler,
+                saveMarkerHandler = saveMarkerHandler
             )
         } else {
             Column {
